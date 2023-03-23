@@ -126,3 +126,28 @@ View(stringency_data)
 
 stringency <- read_csv("OxCGRT_timeseries_all.csv")
 View(stringency)
+
+
+##### new test code for mock plots ###
+
+deaths <- sort(runif(50, min = 0, max = 10), decreasing = TRUE)
+happiness <- sort(runif(50, min=0, max=10), decreasing = FALSE)
+GDP <- sort(runif(50, min=0, max=10), decreasing = FALSE)
+total_mock <- data.frame(stringency, deaths, happiness, GDP)
+total_mock
+
+
+library(ggplot2)
+plot_2020 <- ggplot(data = total_mock) + geom_jitter(mapping = aes(x=stringency, y=deaths, size = happiness, color=GDP)) +
+  theme_bw() + labs(x = "Stringency", y = "Number of deaths per 10000", title="Covid Deaths vs  stringency measures", subtitle = "2021") + theme(legend.position = "bottom")
+plot_2020
+
+stringency_new <- rnorm(100,50,20)
+deaths_new <- rnorm(100,50,20)
+happiness_new <- rnorm(100,50,5)
+GDP_new <- rnorm(100, 50, 5)
+total_mock_new <- data.frame(stringency_new, deaths_new, happiness_new, GDP_new)
+
+plot_2020_new <- ggplot(data = total_mock_new) + geom_jitter(mapping = aes(x=stringency_new, y=deaths_new, size = happiness_new, color=GDP_new)) +
+  theme_bw() + labs(x = "Stringency", y = "Number of deaths per 10000", title="Covid Deaths vs  stringency measures", subtitle = "2020") + theme(legend.position = "bottom")
+plot_2020_new
