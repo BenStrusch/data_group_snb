@@ -1,4 +1,3 @@
-
 library(tidyverse)
 library(ggthemes)
 library(distill)
@@ -6,13 +5,19 @@ library(rmarkdown)
 library(lme4)
 library(readxl)
 library(dplyr)
+library(tidyr)
+#install.packages("ggplot2")
+library(ggplot2)
 
 #read Oxford stringency alltimes data xls file
 OxCGRTall <- read_excel("OxCGRT_timeseries_all.xlsx")
+head(OxCGRTall)
+colnames(OxCGRTall)
 
 #filter for total country to get rid of states
 OxCGRT_country <- OxCGRTall %>%
   filter (jurisdiction == "NAT_TOTAL")
+head(OxCGRT_country)
 
 #delete unnecessary columns
 OxCGRT <- OxCGRT_country %>%
@@ -26,10 +31,13 @@ Ox2021 <- OxCGRT %>%
 Ox2022 <- OxCGRT %>%
   select (country_code, country_name, c(contains("2022")))
 
+
 #transpose by year
 Ox2020_Str <- pivot_longer(Ox2020, cols = c(contains("2020")), names_to = "date", values_to = "stringency")
 Ox2021_Str <- pivot_longer(Ox2021, cols = c(contains("2021")), names_to = "date", values_to = "stringency")
 Ox2022_Str <- pivot_longer(Ox2022, cols = c(contains("2022")), names_to = "date", values_to = "stringency")
+
+
 
 #calculate mean stringency by year and country
 AvgStr2020 <- Ox2020_Str %>%
@@ -49,13 +57,16 @@ Avg_Str_22 <- left_join(AvgStr2022, Avg_Str_0)
 Avg_Str_21 <- left_join(AvgStr2021, Avg_Str_22)
 Avg_Str_all <- left_join(AvgStr2020, Avg_Str_21)
 
+head(Avg_Str_0) ### was wolltest Du damit machen?
+
 #delete all countries with stringency NA
 Avg_Str <- Avg_Str_all %>% drop_na()
+head(Avg_Str)
 
 #rename and add Stringency "0" for 2019
 Avg_Str_year <- Avg_Str %>%
   rename("2020" = "mean_Str2020", "2021" = "mean_Str2021", "2022" = "mean_Str2022")
-Avg_Str_year$"2019"[1:181] <- 0
+Avg_Str_year$"2019"[1:181] <- 0 ### keine Spalte mit 2019
 
 #transpose
 Avg_Str_country <- Avg_Str_year %>%
@@ -73,6 +84,7 @@ happy_2020 <- read.csv("2020.csv", header = TRUE, sep = ",", na.string = "NA", d
 happy_2021 <- read.csv("2021.csv", header = TRUE, sep = ",", na.string = "NA", dec = ".")
 happy_2022 <- read.csv("2022.csv", header = TRUE, sep = ",", na.string = "NA", dec = ",")
 
+
 #combine happiness with Stringency
 #Str all + 2019
 only_happy_2019 <- happy_2019%>%
@@ -88,8 +100,8 @@ only_happy_2020 <- happy_2020%>%
 allStr_h19_20 <- merge(allStr_h2019, only_happy_2020,by="country_name")
 #Str all + 2019 + 2020 + 2021
 only_happy_2021 <- happy_2021%>%
-  select(ï..Country.name, Ladder.score) %>%
-  rename(country_name = ï..Country.name, Happy2021 = Ladder.score)%>%
+  select(Country.name, Ladder.score) %>%
+  rename(country_name = Country.name, Happy2021 = Ladder.score)%>%
   arrange(country_name)
 allStr_h19_20_21 <- merge(allStr_h19_20, only_happy_2021,by="country_name")
 #Str all + 2019 + 2020 + 2021 + 2022
@@ -98,7 +110,7 @@ only_happy_2022 <- happy_2022%>%
   rename(country_name = Country, Happy2022 = Happiness.score)%>%
   arrange(country_name)
 allStr_allHap <- merge(allStr_h19_20_21, only_happy_2022,by="country_name")
-
+head(allStr_allHap)
 #visualizing Stringency vs Happiness per year 2020-2022
 allStr_allHap %>%
   ggplot(aes(x = mean_Str2020, y = Happy2020, col = 2)) +
@@ -115,7 +127,7 @@ allStr_allHap %>%
 Happy_Country_Year_all <- allStr_allHap %>%
   rename("2019" = Happy2019, "2020" = Happy2020, "2021" = Happy2021, "2022" = Happy2022) %>%
   select(country_name, country_code, "2019", "2020", "2021", "2022") %>%
-  pivot_longer (c("2019", "2020", "2021", "2022"), names_to = "year", values_to = "Happiness")
+  pivot_longer(c("2019", "2020", "2021", "2022"), names_to = "year", values_to = "Happiness")
 
 Happy_Country_Year_all %>%
   group_by(country_code) %>%
@@ -129,9 +141,108 @@ Stringency_Country_Year_all <- allStr_allHap %>%
   rename("2020" = mean_Str2020, "2021" = mean_Str2021, "2022" = mean_Str2022) %>%
   select(country_name, country_code, "2020", "2021", "2022") %>%
   pivot_longer (c("2020", "2021", "2022"), names_to = "year", values_to = "Stringency")
-
+head(Stringency_Country_Year_all)
 Stringency_Country_Year_all %>%
   group_by(country_code) %>%
   ggplot(aes(x = year, y = Stringency, col = 2)) +
   geom_point(show.legend = FALSE) +
   facet_wrap(~country_name)
+
+######################################################################
+###################### Covid Death Data ##############################
+######################################################################
+
+getwd()
+covid_data <- read.csv("owid-covid-data.csv")
+
+
+covid_data <- covid_data %>%
+  select(c(location, total_cases, total_deaths, date)) #hosp_patients, total_boosters, icu_patients))
+
+
+covid_data_grouped <- covid_data %>% 
+  group_by(location) %>%
+  arrange(date)
+str(covid_data_grouped$date)
+covid_data_grouped$date <- as.Date(covid_data_grouped$date)
+str(covid_data_grouped$date)
+covid_data_grouped <- covid_data_grouped %>%
+  group_by(location) %>%
+  mutate(days = date - first(date) + 1)
+
+#View(covid_data_grouped)
+
+covid_data_2020_total <- covid_data_grouped[covid_data_grouped$date == '2020-12-31', ]
+covid_data_2021_total <- covid_data_grouped[covid_data_grouped$date == '2021-12-31', ]
+covid_data_2022_total <- covid_data_grouped[covid_data_grouped$date == '2022-12-31', ]
+
+#View(covid_data_2020_total)
+
+#year_2020 <- 2020
+#year_2021 <- 2021
+#year_2022 <- 2022
+
+covid_data_2020_total <- covid_data_2020_total %>%
+  rename(cases_2020 = total_cases, deaths_2020 = total_deaths) %>%
+  select(-c(date, days))
+#covid_data_2020_total$year <- year_2020
+covid_data_2021_total <- covid_data_2021_total %>%
+  rename(cases_2021 = total_cases, deaths_2021 = total_deaths) %>%
+  select(-c(date, days))
+#covid_data_2021_total$year <- year_2021
+covid_data_2022_total <- covid_data_2022_total %>%
+  rename(cases_2022 = total_cases, deaths_2022 = total_deaths) %>%
+  select(-c(date, days))
+#covid_data_2022_total$year <- year_2022
+head(covid_data_2022_total)
+
+covid_deaths_total <- left_join(covid_data_2020_total,covid_data_2021_total, by="location")
+covid_deaths_total <- left_join(covid_deaths_total, covid_data_2022_total, by="location")
+
+
+View(covid_deaths_total)
+
+colnames(covid_deaths_total)
+#install.packages("dbplyr")
+#library(dbplyr)
+
+#covid_deaths_total <- covid_deaths_total %>%
+  #relocate(location, year.x, year.y, year)
+head(covid_deaths_total)
+
+covid_deaths_cleaned <- covid_deaths_total %>%
+  pivot_longer(
+    cols = !location,
+    names_to = c("type", "year"),
+    names_sep = "_",
+    values_to = "score"
+  ) %>%
+  pivot_wider(
+    names_from = type, 
+    values_from = score
+  )
+head(covid_deaths_cleaned)
+  
+head(Stringency_Country_Year_all)
+head(covid_deaths_total)
+
+covid_cases_and_deaths <- covid_deaths_cleaned %>%
+  rename(country_name = location)
+head(covid_deaths_cleaned)
+
+total_data <- full_join(Stringency_Country_Year_all, covid_cases_and_deaths, by=c("country_name", "year"))
+total_data <- full_join(Happy_Country_Year_all, total_data, by=c("country_name", "year"))
+head(total_data)
+
+
+total_data <- total_data[,-5]
+
+View(total_data)
+
+
+#############################################################
+############# Resource for Covid Data #######################
+#############################################################
+
+
+#Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
