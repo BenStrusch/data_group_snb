@@ -2,6 +2,9 @@
 title: "Initial_trial_and_error_markdown_file"
 output: html_document
 date: "`r Sys.Date()`"
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -10,9 +13,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This is an R Markdown document. Markdown is a simple formatting syntax
+for authoring HTML, PDF, and MS Word documents. For more details on
+using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+When you click the **Knit** button a document will be generated that
+includes both content as well as the output of any embedded R code
+chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
 summary(cars)
@@ -26,16 +33,14 @@ You can also embed plots, for example:
 plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Note that the `echo = FALSE` parameter was added to the code chunk to
+prevent printing of the R code that generated the plot.
 
+### Use the space below to work around and with code, this document is for us to experiment and share ideas
 
-
-### Use the space below to work around and with code, this document is for us to experiment and share ideas ###
-
-# Attempt to read in the happiness data from 2020 to see if there is an effect of covid-deaths on happiness 
+# Attempt to read in the happiness data from 2020 to see if there is an effect of covid-deaths on happiness
 
 # libraries and packages to load
-
 
 ```{r}
 
@@ -53,8 +58,7 @@ library(viridis)
 
 ```
 
-
-# 1. read Oxford stringency alltimes data xls file 
+# 1. read Oxford stringency alltimes data xls file
 
 # 2. filter for total country to get rid of states
 
@@ -107,11 +111,9 @@ AvgStr2022 <- Ox2022_Str %>%
   summarize(mean_Str2022 = mean(stringency))
 ```
 
-
 # 8. combine to one table incl country_code
 
-### head(Avg_Str_0) was wolltest Du damit machen? ###
-
+### head(Avg_Str_0) was wolltest Du damit machen?
 
 ```{r}
 Avg_Str_0 <- OxCGRT_country %>%
@@ -120,7 +122,6 @@ Avg_Str_22 <- left_join(AvgStr2022, Avg_Str_0)
 Avg_Str_21 <- left_join(AvgStr2021, Avg_Str_22)
 Avg_Str_all <- left_join(AvgStr2020, Avg_Str_21)
 ```
-
 
 #delete all countries with stringency NA
 
@@ -138,26 +139,23 @@ Avg_Str_year$"2019"[1:181] <- 0 ### keine Spalte mit 2019
 
 #transpose
 
-
 ```{r}
 Avg_Str_country <- Avg_Str_year %>%
   pivot_longer (c("2019", "2020", "2021", "2022"), names_to = "year", values_to = "stringency")
 
 ```
 
-
 #visualizing stringency per country 2019-2022
 
-  
 ```{r}
 Avg_Str_country %>%
   ggplot(aes(year, stringency, col = country_code)) +
   geom_point(show.legend = FALSE) +
   facet_wrap(~country_code)
 ```
-  
 
 #load happiness scores
+
 ```{r}
 happy_2019 <- read.csv("2019.csv", header = TRUE, sep = ",", na.string = "NA", dec = ".")
 happy_2020 <- read.csv("2020.csv", header = TRUE, sep = ",", na.string = "NA", dec = ".")
@@ -165,10 +163,7 @@ happy_2021 <- read.csv("2021.csv", header = TRUE, sep = ",", na.string = "NA", d
 happy_2022 <- read.csv("2022.csv", header = TRUE, sep = ",", na.string = "NA", dec = ",")
 ```
 
-
-
-#combine happiness with Stringency
-#Str all + 2019
+#combine happiness with Stringency #Str all + 2019
 
 ```{r}
 only_happy_2019 <- happy_2019%>%
@@ -179,6 +174,7 @@ allStr_h2019 <- merge(Avg_Str_all, only_happy_2019,by="country_name")
 ```
 
 #Str all + 2019 + 2020
+
 ```{r}
 only_happy_2020 <- happy_2020%>%
   select(Country.name, Ladder.score) %>%
@@ -188,6 +184,7 @@ allStr_h19_20 <- merge(allStr_h2019, only_happy_2020,by="country_name")
 ```
 
 #Str all + 2019 + 2020 + 2021
+
 ```{r}
 only_happy_2021 <- happy_2021%>%
   select(Country.name, Ladder.score) %>%
@@ -197,6 +194,7 @@ allStr_h19_20_21 <- merge(allStr_h19_20, only_happy_2021,by="country_name")
 ```
 
 #Str all + 2019 + 2020 + 2021 + 2022
+
 ```{r}
 only_happy_2022 <- happy_2022%>%
   select(Country, Happiness.score) %>%
@@ -220,8 +218,8 @@ allStr_allHap %>%
   geom_point(show.legend = FALSE)
 ```
 
-#visualizing Happiness per country over time 2019-2022
-#transpose first
+#visualizing Happiness per country over time 2019-2022 #transpose first
+
 ```{r}
 Happy_Country_Year_all <- allStr_allHap %>%
   rename("2019" = Happy2019, "2020" = Happy2020, "2021" = Happy2021, "2022" = Happy2022) %>%
@@ -235,9 +233,7 @@ Happy_Country_Year_all %>%
   facet_wrap(~country_name)
 ```
 
-
-#visualizing Stringency per country over time 2020-2022
-#transpose first
+#visualizing Stringency per country over time 2020-2022 #transpose first
 
 ```{r}
 
@@ -254,42 +250,48 @@ Stringency_Country_Year_all %>%
 
 ```
 
+###################################################################### 
 
-######################################################################
-###################### Covid Death Data ##############################
-######################################################################
+###################### Covid Death Data
 
+###################################################################### 
 
 load covid data, then unselect unnecessary columns
 
-Source: (Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
-)
+Source: (Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron
+Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani,
+Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) -
+"Coronavirus Pandemic (COVID-19)". Published online at
+OurWorldInData.org. Retrieved from:
+'<https://ourworldindata.org/coronavirus>' [Online Resource] )
 
 ```{r}
 
+getwd()
 covid_data <- read.csv("owid-covid-data.csv")
 #covid_data_china <- covid_data %>% filter(location == "China")
+#View(covid_data)
 
 
 covid_data <- covid_data %>%
-  select(c(location, total_cases, total_deaths, date)) #hosp_patients, total_boosters, icu_patients))
+  select(c(location, total_cases_per_million, total_deaths_per_million, date)) #hosp_patients, total_boosters, icu_patients))
 
 ```
 
 Group data, compute date variable, create numeric days variable
-  
+
 ```{r}
+
 covid_data_grouped <- covid_data %>% 
   group_by(location) %>%
   arrange(date)
-str(covid_data_grouped$date)
+#str(covid_data_grouped$date)
 covid_data_grouped$date <- as.Date(covid_data_grouped$date)
 str(covid_data_grouped$date)
 covid_data_grouped <- covid_data_grouped %>%
   group_by(location) %>%
   mutate(days = date - first(date) + 1)
 ```
-
 
 #create total covid data for each year
 
@@ -309,20 +311,19 @@ covid_data_2019_total$cases_2019 <- 0
 covid_data_2019_total$deaths_2019 <- 0
 
 covid_data_2020_total <- covid_data_2020_total %>%
-  rename(cases_2020 = total_cases, deaths_2020 = total_deaths) %>%
+  rename(cases_2020 = total_cases_per_million, deaths_2020 = total_deaths_per_million) %>%
   select(-c(date, days))
 
 covid_data_2021_total <- covid_data_2021_total %>%
-  rename(cases_2021 = total_cases, deaths_2021 = total_deaths) %>%
+  rename(cases_2021 = total_cases_per_million, deaths_2021 = total_deaths_per_million) %>%
   select(-c(date, days))
 
 covid_data_2022_total <- covid_data_2022_total %>%
-  rename(cases_2022 = total_cases, deaths_2022 = total_deaths) %>%
+  rename(cases_2022 = total_cases_per_million, deaths_2022 = total_deaths_per_million) %>%
   select(-c(date, days))
 
-head(covid_data_2022_total)
+#head(covid_data_2022_total)
 ```
-
 
 # combine tables together to create total data_frame
 
@@ -336,17 +337,39 @@ covid_deaths_total <- left_join(covid_deaths_total, covid_data_2022_total, by="l
 
 ```
 
+### mutate Differences between 2021 and 2020 & 2022 and 2021 
+### set differences for 2019 and 2020 to 0
+
+```{r}
+covid_deaths_total <- covid_deaths_total %>%
+  mutate(casediff_2020 = cases_2020) %>%
+  mutate(deathsdiff_2020 = deaths_2020) %>%
+  mutate(casediff_2021 = cases_2021 - cases_2020) %>%
+  mutate(deathsdiff_2021 = deaths_2021 - deaths_2020) %>%
+  mutate(casediff_2022 = cases_2022 - cases_2021) %>%
+  mutate(deathsdiff_2022 = deaths_2022 - deaths_2021)
+
+covid_deaths_total["casediff_2021"][is.na(covid_deaths_total["casediff_2021"])] <- 0
+covid_deaths_total["casediff_2022"][is.na(covid_deaths_total["casediff_2022"])] <- 0
+covid_deaths_total["deathsdiff_2021"][is.na(covid_deaths_total["deathsdiff_2021"])] <- 0
+covid_deaths_total["deathsdiff_2022"][is.na(covid_deaths_total["deathsdiff_2022"])] <- 0
+```
+
 
 # view col names, then install packages to relocate and reorder column names for pivoting
+
 # pivot longer to get years in each row (one column), then pivot wider to get separate columns for deaths and cases
 
 # rename colnames to fit colnames in happiness and stringency data frames
+
 ```{r}
 colnames(covid_deaths_total)
 #install.packages("dbplyr")
 #library(dbplyr)
 
 #covid_deaths_total <- covid_deaths_total %>% relocate(location, year.x, year.y, year)
+head(covid_deaths_total)
+
 head(covid_deaths_total)
 
 covid_deaths_cleaned <- covid_deaths_total %>%
@@ -360,46 +383,68 @@ covid_deaths_cleaned <- covid_deaths_total %>%
     names_from = type, 
     values_from = score
   )
-
-head(covid_deaths_cleaned)
-
-covid_cases_and_deaths <- covid_deaths_cleaned %>%
-  rename(country_name = location)
-
-head(covid_cases_and_deaths)
 ```
 
 # create total data frame with cases, deaths, stringency and happiness
+
 # remove duplicate column
+
 # rename other duplicate appropriately
+
 # view data frame
 
 ```{r}
 
+covid_cases_and_deaths <- covid_deaths_cleaned %>%
+  rename(country_name = location)
+head(covid_deaths_cleaned)
+
 total_data <- full_join(Stringency_Country_Year_all, covid_cases_and_deaths, by=c("country_name", "year"))
 total_data <- full_join(Happy_Country_Year_all, total_data, by=c("country_name", "year"))
-head(total_data)
+#head(total_data)
 
-total_data <- total_data[,-5] # removes duplicate col nbr. 5
+
+total_data <- total_data[,-5]
+
+#head(total_data)
 
 total_data <- total_data %>%
-  rename(country_code = country_code.x)  # renames column
+  rename(country_code = country_code.x)
+
+total_data["casediff"][is.na(total_data["casediff"])] <- 0
+total_data["deathsdiff"][is.na(total_data["deathsdiff"])] <- 0
 
 View(total_data)
 
 ```
 
-
 # create plots
-
 
 ```{r}
 happiness_by_cases <- total_data %>%
-  ggplot(aes(x = Stringency, y = Happiness, col=deaths)) + 
+  ggplot(aes(x = deathsdiff, y = Happiness, col=casediff, size=)) + 
   geom_point() +
   theme_minimal() +
   scale_color_viridis() +
-  facet_wrap(~year)
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Stringency vs. Happiness", subtitle="dependent on case and death differences between 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale="free")
+```
+
+# some initial code to check for significances 
+
+```{r}
 
 happiness_by_cases
+
+model1_hapcase <- lm(Happiness ~ Stringency + casediff + deathsdiff, data=total_data)
+model2_hapcasediff <- lm(Happiness ~ casediff * deathsdiff, data=total_data)
+
+summary(model1_hapcase)
+summary(model2_hapcasediff)
+
+lmermodell <- lmer(Happiness ~ 1 + casediff + (1 + casediff|country_name), data=total_data)
+summary(lmermodell)
 ```
+

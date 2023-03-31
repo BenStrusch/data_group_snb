@@ -154,18 +154,19 @@ Stringency_Country_Year_all %>%
 
 getwd()
 covid_data <- read.csv("owid-covid-data.csv")
-covid_data_china <- covid_data %>%
-  filter(location == "China")
-View(covid_data_china)
+#covid_data_china <- covid_data %>% filter(location == "China")
+#View(covid_data)
+
 
 covid_data <- covid_data %>%
-  select(c(location, total_cases, total_deaths, date)) #hosp_patients, total_boosters, icu_patients))
+  select(c(location, total_cases_per_million, total_deaths_per_million, date)) #hosp_patients, total_boosters, icu_patients))
+
 
 
 covid_data_grouped <- covid_data %>% 
   group_by(location) %>%
   arrange(date)
-str(covid_data_grouped$date)
+#str(covid_data_grouped$date)
 covid_data_grouped$date <- as.Date(covid_data_grouped$date)
 str(covid_data_grouped$date)
 covid_data_grouped <- covid_data_grouped %>%
@@ -190,25 +191,38 @@ covid_data_2019_total$cases_2019 <- 0
 covid_data_2019_total$deaths_2019 <- 0
 
 covid_data_2020_total <- covid_data_2020_total %>%
-  rename(cases_2020 = total_cases, deaths_2020 = total_deaths) %>%
+  rename(cases_2020 = total_cases_per_million, deaths_2020 = total_deaths_per_million) %>%
   select(-c(date, days))
-#covid_data_2020_total$year <- year_2020
+
 covid_data_2021_total <- covid_data_2021_total %>%
-  rename(cases_2021 = total_cases, deaths_2021 = total_deaths) %>%
+  rename(cases_2021 = total_cases_per_million, deaths_2021 = total_deaths_per_million) %>%
   select(-c(date, days))
-#covid_data_2021_total$year <- year_2021
+
 covid_data_2022_total <- covid_data_2022_total %>%
-  rename(cases_2022 = total_cases, deaths_2022 = total_deaths) %>%
+  rename(cases_2022 = total_cases_per_million, deaths_2022 = total_deaths_per_million) %>%
   select(-c(date, days))
-#covid_data_2022_total$year <- year_2022
-head(covid_data_2022_total)
+
+#head(covid_data_2022_total)
 
 covid_deaths_total <- left_join(covid_data_2019_total,covid_data_2020_total, by="location")
 covid_deaths_total <- left_join(covid_deaths_total, covid_data_2021_total, by="location")
 covid_deaths_total <- left_join(covid_deaths_total, covid_data_2022_total, by="location")
 
 
-View(covid_deaths_total)
+#View(covid_deaths_total)
+
+covid_deaths_total <- covid_deaths_total %>%
+  mutate(casediff_2020 = cases_2020) %>%
+  mutate(deathsdiff_2020 = deaths_2020) %>%
+  mutate(casediff_2021 = cases_2021 - cases_2020) %>%
+  mutate(deathsdiff_2021 = deaths_2021 - deaths_2020) %>%
+  mutate(casediff_2022 = cases_2022 - cases_2021) %>%
+  mutate(deathsdiff_2022 = deaths_2022 - deaths_2021)
+
+covid_deaths_total["casediff_2021"][is.na(covid_deaths_total["casediff_2021"])] <- 0
+covid_deaths_total["casediff_2022"][is.na(covid_deaths_total["casediff_2022"])] <- 0
+covid_deaths_total["deathsdiff_2021"][is.na(covid_deaths_total["deathsdiff_2021"])] <- 0
+covid_deaths_total["deathsdiff_2022"][is.na(covid_deaths_total["deathsdiff_2022"])] <- 0
 
 colnames(covid_deaths_total)
 #install.packages("dbplyr")
@@ -229,10 +243,10 @@ covid_deaths_cleaned <- covid_deaths_total %>%
     names_from = type, 
     values_from = score
   )
-head(covid_deaths_cleaned)
+#head(covid_deaths_cleaned)
   
-head(Stringency_Country_Year_all)
-head(covid_deaths_total)
+#head(Stringency_Country_Year_all)
+#head(covid_deaths_total)
 
 covid_cases_and_deaths <- covid_deaths_cleaned %>%
   rename(country_name = location)
@@ -240,25 +254,44 @@ head(covid_deaths_cleaned)
 
 total_data <- full_join(Stringency_Country_Year_all, covid_cases_and_deaths, by=c("country_name", "year"))
 total_data <- full_join(Happy_Country_Year_all, total_data, by=c("country_name", "year"))
-head(total_data)
+#head(total_data)
 
 
 total_data <- total_data[,-5]
 
-View(total_data)
+#head(total_data)
 
 total_data <- total_data %>%
   rename(country_code = country_code.x)
 
+total_data["casediff"][is.na(total_data["casediff"])] <- 0
+total_data["deathsdiff"][is.na(total_data["deathsdiff"])] <- 0
+
 View(total_data)
 
+
+
 happiness_by_cases <- total_data %>%
-  ggplot(aes(x = year, y = Happiness, col=country_code)) + 
-  geom_jitter(show.legend = FALSE) +
-  theme_minimal()
+  ggplot(aes(x = deathsdiff, y = Happiness, col=casediff, size=)) + 
+  geom_point() +
+  theme_minimal() +
+  scale_color_viridis() +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Stringency vs. Happiness", subtitle="dependent on case and death differences between 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale="free")
+
 
 happiness_by_cases
 
+model1_hapcase <- lm(Happiness ~ Stringency + casediff + deathsdiff, data=total_data)
+model2_hapcasediff <- lm(Happiness ~ casediff * deathsdiff, data=total_data)
+
+summary(model1_hapcase)
+summary(model2_hapcasediff)
+
+lmermodell <- lmer(Happiness ~ 1 + casediff + (1 + casediff|country_name), data=total_data)
+summary(lmermodell)
 
 #############################################################
 ############# Resource for Covid Data #######################
