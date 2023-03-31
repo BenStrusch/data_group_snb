@@ -395,7 +395,7 @@ View(total_data)
 
 ```{r}
 happiness_by_cases <- total_data %>%
-  ggplot(aes(x = Stringency, y = Happiness, col=cases)) + 
+  ggplot(aes(x = Stringency, y = Happiness, col=deaths)) + 
   geom_point() +
   theme_minimal() +
   scale_color_viridis() +
