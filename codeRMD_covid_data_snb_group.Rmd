@@ -1,3 +1,44 @@
+---
+title: "Initial_trial_and_error_markdown_file"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+### Use the space below to work around and with code, this document is for us to experiment and share ideas ###
+
+# Attempt to read in the happiness data from 2020 to see if there is an effect of covid-deaths on happiness 
+
+# libraries and packages to load
+
+
+```{r}
+
 library(tidyverse)
 library(ggthemes)
 library(distill)
@@ -9,21 +50,32 @@ library(tidyr)
 #install.packages("ggplot2")
 library(ggplot2)
 
-#read Oxford stringency alltimes data xls file
+```
+
+
+# 1. read Oxford stringency alltimes data xls file 
+
+# 2. filter for total country to get rid of states
+
+# 3. delete unnecessary columns
+
+# 4. df by year
+
+```{r}
 OxCGRTall <- read_excel("OxCGRT_timeseries_all.xlsx")
 head(OxCGRTall)
 colnames(OxCGRTall)
 
-#filter for total country to get rid of states
 OxCGRT_country <- OxCGRTall %>%
   filter (jurisdiction == "NAT_TOTAL")
 head(OxCGRT_country)
 
-#delete unnecessary columns
+
 OxCGRT <- OxCGRT_country %>%
   select (-region_code, -region_name, -jurisdiction, -c(contains("2023")))
 
-#df by year
+
+
 Ox2020 <- OxCGRT %>%
   select (country_code, country_name, c(contains("2020")))
 Ox2021 <- OxCGRT %>%
@@ -31,15 +83,18 @@ Ox2021 <- OxCGRT %>%
 Ox2022 <- OxCGRT %>%
   select (country_code, country_name, c(contains("2022")))
 
+```
 
-#transpose by year
+# 5. transpose by year
+
+# 6. calculate mean stringency by year
+
+```{r}
 Ox2020_Str <- pivot_longer(Ox2020, cols = c(contains("2020")), names_to = "date", values_to = "stringency")
 Ox2021_Str <- pivot_longer(Ox2021, cols = c(contains("2021")), names_to = "date", values_to = "stringency")
 Ox2022_Str <- pivot_longer(Ox2022, cols = c(contains("2022")), names_to = "date", values_to = "stringency")
 
 
-
-#calculate mean stringency by year and country
 AvgStr2020 <- Ox2020_Str %>%
   group_by(country_name) %>%
   summarize(mean_Str2020 = mean(stringency))
@@ -49,15 +104,22 @@ AvgStr2021 <- Ox2021_Str %>%
 AvgStr2022 <- Ox2022_Str %>%
   group_by(country_name) %>%
   summarize(mean_Str2022 = mean(stringency))
+```
 
-#combine to one table incl country_code
+
+# 8. combine to one table incl country_code
+
+### head(Avg_Str_0) was wolltest Du damit machen? ###
+
+
+```{r}
 Avg_Str_0 <- OxCGRT_country %>%
   select(country_code, country_name)
 Avg_Str_22 <- left_join(AvgStr2022, Avg_Str_0)
 Avg_Str_21 <- left_join(AvgStr2021, Avg_Str_22)
 Avg_Str_all <- left_join(AvgStr2020, Avg_Str_21)
+```
 
-head(Avg_Str_0) ### was wolltest Du damit machen?
 
 #delete all countries with stringency NA
 Avg_Str <- Avg_Str_all %>% drop_na()
@@ -87,31 +149,46 @@ happy_2022 <- read.csv("2022.csv", header = TRUE, sep = ",", na.string = "NA", d
 
 #combine happiness with Stringency
 #Str all + 2019
+
+```{r}
 only_happy_2019 <- happy_2019%>%
   select(Country.or.region, Score) %>%
   rename(country_name = Country.or.region, Happy2019 = Score)%>%
   arrange(country_name)
 allStr_h2019 <- merge(Avg_Str_all, only_happy_2019,by="country_name")
+```
+
 #Str all + 2019 + 2020
+```{r}
 only_happy_2020 <- happy_2020%>%
   select(Country.name, Ladder.score) %>%
   rename(country_name = Country.name, Happy2020 = Ladder.score)%>%
   arrange(country_name)
 allStr_h19_20 <- merge(allStr_h2019, only_happy_2020,by="country_name")
+```
+
 #Str all + 2019 + 2020 + 2021
+```{r}
 only_happy_2021 <- happy_2021%>%
   select(Country.name, Ladder.score) %>%
   rename(country_name = Country.name, Happy2021 = Ladder.score)%>%
   arrange(country_name)
 allStr_h19_20_21 <- merge(allStr_h19_20, only_happy_2021,by="country_name")
+```
+
 #Str all + 2019 + 2020 + 2021 + 2022
+```{r}
 only_happy_2022 <- happy_2022%>%
   select(Country, Happiness.score) %>%
   rename(country_name = Country, Happy2022 = Happiness.score)%>%
   arrange(country_name)
 allStr_allHap <- merge(allStr_h19_20_21, only_happy_2022,by="country_name")
 head(allStr_allHap)
+```
+
 #visualizing Stringency vs Happiness per year 2020-2022
+
+```{r}
 allStr_allHap %>%
   ggplot(aes(x = mean_Str2020, y = Happy2020, col = 2)) +
   geom_point(show.legend = FALSE)
@@ -121,9 +198,11 @@ allStr_allHap %>%
 allStr_allHap %>%
   ggplot(aes(mean_Str2022, Happy2022, col = "GREEN")) +
   geom_point(show.legend = FALSE)
+```
 
 #visualizing Happiness per country over time 2019-2022
 #transpose first
+```{r}
 Happy_Country_Year_all <- allStr_allHap %>%
   rename("2019" = Happy2019, "2020" = Happy2020, "2021" = Happy2021, "2022" = Happy2022) %>%
   select(country_name, country_code, "2019", "2020", "2021", "2022") %>%
@@ -134,9 +213,14 @@ Happy_Country_Year_all %>%
   ggplot(aes(x = year, y = Happiness, col = 2)) +
   geom_point(show.legend = FALSE) +
   facet_wrap(~country_name)
+```
+
 
 #visualizing Stringency per country over time 2020-2022
 #transpose first
+
+```{r}
+
 Stringency_Country_Year_all <- allStr_allHap %>%
   rename("2020" = mean_Str2020, "2021" = mean_Str2021, "2022" = mean_Str2022) %>%
   select(country_name, country_code, "2020", "2021", "2022") %>%
@@ -148,20 +232,32 @@ Stringency_Country_Year_all %>%
   geom_point(show.legend = FALSE) +
   facet_wrap(~country_name)
 
+```
+
+
 ######################################################################
 ###################### Covid Death Data ##############################
 ######################################################################
 
-getwd()
+
+load covid data, then unselect unnecessary columns
+
+Source: (Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
+)
+
+```{r}
+
 covid_data <- read.csv("owid-covid-data.csv")
-covid_data_china <- covid_data %>%
-  filter(location == "China")
-View(covid_data_china)
+#covid_data_china <- covid_data %>% filter(location == "China")
 
 covid_data <- covid_data %>%
   select(c(location, total_cases, total_deaths, date)) #hosp_patients, total_boosters, icu_patients))
 
+```
 
+Group data, compute date variable, create numeric days variable
+  
+```{r}
 covid_data_grouped <- covid_data %>% 
   group_by(location) %>%
   arrange(date)
@@ -171,19 +267,21 @@ str(covid_data_grouped$date)
 covid_data_grouped <- covid_data_grouped %>%
   group_by(location) %>%
   mutate(days = date - first(date) + 1)
+```
 
-#View(covid_data_grouped)
 
+#create total covid data for each year
+
+```{r}
 covid_data_2020_total <- covid_data_grouped[covid_data_grouped$date == '2020-12-31', ]
 covid_data_2021_total <- covid_data_grouped[covid_data_grouped$date == '2021-12-31', ]
 covid_data_2022_total <- covid_data_grouped[covid_data_grouped$date == '2022-12-31', ]
 
-#View(covid_data_2020_total)
+```
 
-#year_2020 <- 2020
-#year_2021 <- 2021
-#year_2022 <- 2022
+# create covid data frame for cases and deaths for each year, then view result
 
+```{r}
 covid_data_2019_total <- covid_data_2020_total %>%
   select(location)
 covid_data_2019_total$cases_2019 <- 0
@@ -192,17 +290,22 @@ covid_data_2019_total$deaths_2019 <- 0
 covid_data_2020_total <- covid_data_2020_total %>%
   rename(cases_2020 = total_cases, deaths_2020 = total_deaths) %>%
   select(-c(date, days))
-#covid_data_2020_total$year <- year_2020
+
 covid_data_2021_total <- covid_data_2021_total %>%
   rename(cases_2021 = total_cases, deaths_2021 = total_deaths) %>%
   select(-c(date, days))
-#covid_data_2021_total$year <- year_2021
+
 covid_data_2022_total <- covid_data_2022_total %>%
   rename(cases_2022 = total_cases, deaths_2022 = total_deaths) %>%
   select(-c(date, days))
-#covid_data_2022_total$year <- year_2022
-head(covid_data_2022_total)
 
+head(covid_data_2022_total)
+```
+
+
+# combine tables together to create total data_frame
+
+```{r}
 covid_deaths_total <- left_join(covid_data_2019_total,covid_data_2020_total, by="location")
 covid_deaths_total <- left_join(covid_deaths_total, covid_data_2021_total, by="location")
 covid_deaths_total <- left_join(covid_deaths_total, covid_data_2022_total, by="location")
@@ -210,12 +313,19 @@ covid_deaths_total <- left_join(covid_deaths_total, covid_data_2022_total, by="l
 
 View(covid_deaths_total)
 
+```
+
+
+# view col names, then install packages to relocate and reorder column names for pivoting
+# pivot longer to get years in each row (one column), then pivot wider to get separate columns for deaths and cases
+
+# rename colnames to fit colnames in happiness and stringency data frames
+```{r}
 colnames(covid_deaths_total)
 #install.packages("dbplyr")
 #library(dbplyr)
 
-#covid_deaths_total <- covid_deaths_total %>%
-  #relocate(location, year.x, year.y, year)
+#covid_deaths_total <- covid_deaths_total %>% relocate(location, year.x, year.y, year)
 head(covid_deaths_total)
 
 covid_deaths_cleaned <- covid_deaths_total %>%
@@ -229,40 +339,44 @@ covid_deaths_cleaned <- covid_deaths_total %>%
     names_from = type, 
     values_from = score
   )
+
 head(covid_deaths_cleaned)
-  
-head(Stringency_Country_Year_all)
-head(covid_deaths_total)
 
 covid_cases_and_deaths <- covid_deaths_cleaned %>%
   rename(country_name = location)
-head(covid_deaths_cleaned)
+
+head(covid_cases_and_deaths)
+```
+
+# create total data frame with cases, deaths, stringency and happiness
+# remove duplicate column
+# rename other duplicate appropriately
+# view data frame
+
+```{r}
 
 total_data <- full_join(Stringency_Country_Year_all, covid_cases_and_deaths, by=c("country_name", "year"))
 total_data <- full_join(Happy_Country_Year_all, total_data, by=c("country_name", "year"))
 head(total_data)
 
-
-total_data <- total_data[,-5]
-
-View(total_data)
+total_data <- total_data[,-5] # removes duplicate col nbr. 5
 
 total_data <- total_data %>%
-  rename(country_code = country_code.x)
+  rename(country_code = country_code.x)  # renames column
 
 View(total_data)
 
+```
+
+
+# create plots
+
+
+```{r}
 happiness_by_cases <- total_data %>%
   ggplot(aes(x = year, y = Happiness, col=country_code)) + 
   geom_jitter(show.legend = FALSE) +
   theme_minimal()
 
 happiness_by_cases
-
-
-#############################################################
-############# Resource for Covid Data #######################
-#############################################################
-
-
-#Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
+```
