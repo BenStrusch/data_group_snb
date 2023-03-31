@@ -243,10 +243,10 @@ covid_deaths_cleaned <- covid_deaths_total %>%
     names_from = type, 
     values_from = score
   )
-#head(covid_deaths_cleaned)
+head(covid_deaths_cleaned)
   
-#head(Stringency_Country_Year_all)
-#head(covid_deaths_total)
+head(Stringency_Country_Year_all)
+head(covid_deaths_total)
 
 covid_cases_and_deaths <- covid_deaths_cleaned %>%
   rename(country_name = location)
@@ -254,12 +254,12 @@ head(covid_deaths_cleaned)
 
 total_data <- full_join(Stringency_Country_Year_all, covid_cases_and_deaths, by=c("country_name", "year"))
 total_data <- full_join(Happy_Country_Year_all, total_data, by=c("country_name", "year"))
-#head(total_data)
+head(total_data)
 
 
 total_data <- total_data[,-5]
 
-#head(total_data)
+View(total_data)
 
 total_data <- total_data %>%
   rename(country_code = country_code.x)
@@ -272,14 +272,14 @@ View(total_data)
 
 
 happiness_by_cases <- total_data %>%
-  ggplot(aes(x = deathsdiff, y = Happiness, col=casediff, size=)) + 
-  geom_point() +
+  ggplot(aes(x = casediff, y = Happiness, col=deathsdiff, size=)) + 
+  geom_point() + ##(aes(size=deathsdiff)) +
   theme_minimal() +
-  scale_color_viridis() +
+  scale_colour_gradientn(colors=rainbow(7)) +
   #facet_wrap(~year, scales = "free") +
   labs(title="Stringency vs. Happiness", subtitle="dependent on case and death differences between 2020 - 2022") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
-  facet_wrap(~year, scale="free")
+  facet_wrap(~year, scale = "free")
 
 
 happiness_by_cases
@@ -288,10 +288,8 @@ model1_hapcase <- lm(Happiness ~ Stringency + casediff + deathsdiff, data=total_
 model2_hapcasediff <- lm(Happiness ~ casediff * deathsdiff, data=total_data)
 
 summary(model1_hapcase)
-summary(model2_hapcasediff)
 
-lmermodell <- lmer(Happiness ~ 1 + casediff + (1 + casediff|country_name), data=total_data)
-summary(lmermodell)
+
 
 #############################################################
 ############# Resource for Covid Data #######################

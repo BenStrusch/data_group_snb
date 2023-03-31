@@ -421,15 +421,36 @@ View(total_data)
 # create plots
 
 ```{r}
-happiness_by_cases <- total_data %>%
-  ggplot(aes(x = deathsdiff, y = Happiness, col=casediff, size=)) + 
-  geom_point() +
+happiness_by_stringency <- total_data %>%
+  ggplot(aes(x = Stringency, y = Happiness, col=casediff, size=)) + 
+  geom_point(aes(size=deathsdiff)) +
   theme_minimal() +
-  scale_color_viridis() +
+  scale_colour_gradientn(colors=rainbow(7)) +
   #facet_wrap(~year, scales = "free") +
   labs(title="Stringency vs. Happiness", subtitle="dependent on case and death differences between 2020 - 2022") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
-  facet_wrap(~year, scale="free")
+  facet_wrap(~year, scale = "free")
+
+
+happiness_by_stringency
+
+```
+
+## plot cases vs. happiness by deaths
+
+```{r}
+happiness_by_cases <- total_data %>%
+  ggplot(aes(x = casediff, y = Happiness, col=deathsdiff, size=)) + 
+  geom_point() + ##(aes(size=deathsdiff)) +
+  theme_minimal() +
+  scale_colour_gradientn(colors=rainbow(7)) +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Stringency vs. Happiness", subtitle="dependent on case and death differences between 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale = "free")
+
+
+happiness_by_cases
 ```
 
 # some initial code to check for significances 
