@@ -49,6 +49,7 @@ library(dplyr)
 library(tidyr)
 #install.packages("ggplot2")
 library(ggplot2)
+library(viridis)
 
 ```
 
@@ -122,29 +123,48 @@ Avg_Str_all <- left_join(AvgStr2020, Avg_Str_21)
 
 
 #delete all countries with stringency NA
+
+```{r}
 Avg_Str <- Avg_Str_all %>% drop_na()
-head(Avg_Str)
+```
 
 #rename and add Stringency "0" for 2019
+
+```{r}
 Avg_Str_year <- Avg_Str %>%
   rename("2020" = "mean_Str2020", "2021" = "mean_Str2021", "2022" = "mean_Str2022")
 Avg_Str_year$"2019"[1:181] <- 0 ### keine Spalte mit 2019
+```
 
 #transpose
+
+
+```{r}
 Avg_Str_country <- Avg_Str_year %>%
   pivot_longer (c("2019", "2020", "2021", "2022"), names_to = "year", values_to = "stringency")
 
+```
+
+
 #visualizing stringency per country 2019-2022
+
+  
+```{r}
 Avg_Str_country %>%
   ggplot(aes(year, stringency, col = country_code)) +
   geom_point(show.legend = FALSE) +
   facet_wrap(~country_code)
+```
+  
 
 #load happiness scores
+```{r}
 happy_2019 <- read.csv("2019.csv", header = TRUE, sep = ",", na.string = "NA", dec = ".")
 happy_2020 <- read.csv("2020.csv", header = TRUE, sep = ",", na.string = "NA", dec = ".")
 happy_2021 <- read.csv("2021.csv", header = TRUE, sep = ",", na.string = "NA", dec = ".")
 happy_2022 <- read.csv("2022.csv", header = TRUE, sep = ",", na.string = "NA", dec = ",")
+```
+
 
 
 #combine happiness with Stringency
@@ -250,6 +270,7 @@ Source: (Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Ch
 covid_data <- read.csv("owid-covid-data.csv")
 #covid_data_china <- covid_data %>% filter(location == "China")
 
+
 covid_data <- covid_data %>%
   select(c(location, total_cases, total_deaths, date)) #hosp_patients, total_boosters, icu_patients))
 
@@ -311,7 +332,7 @@ covid_deaths_total <- left_join(covid_deaths_total, covid_data_2021_total, by="l
 covid_deaths_total <- left_join(covid_deaths_total, covid_data_2022_total, by="location")
 
 
-View(covid_deaths_total)
+#View(covid_deaths_total)
 
 ```
 
@@ -374,9 +395,11 @@ View(total_data)
 
 ```{r}
 happiness_by_cases <- total_data %>%
-  ggplot(aes(x = year, y = Happiness, col=country_code)) + 
-  geom_jitter(show.legend = FALSE) +
-  theme_minimal()
+  ggplot(aes(x = Stringency, y = Happiness, col=cases)) + 
+  geom_point() +
+  theme_minimal() +
+  scale_color_viridis() +
+  facet_wrap(~year)
 
 happiness_by_cases
 ```
