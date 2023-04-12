@@ -440,14 +440,14 @@ happiness_by_stringency
 
 ```{r}
 happiness_by_cases <- total_data %>%
-  ggplot(aes(x = casediff, y = Happiness, col=deathsdiff, size=)) + 
+  ggplot(aes(x = deathsdiff, y = Happiness, col=casediff)) + 
   geom_point() + ##(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
   #facet_wrap(~year, scales = "free") +
-  labs(title="Stringency vs. Happiness", subtitle="dependent on case and death differences between 2020 - 2022") +
+  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
-  facet_wrap(~year, scale = "free")
+  facet_wrap(~year, scale = "free") #+ stat_smooth(method = 'lm')
 
 
 happiness_by_cases

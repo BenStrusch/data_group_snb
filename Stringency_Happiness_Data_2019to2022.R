@@ -141,7 +141,7 @@ Stringency_Country_Year_all <- allStr_allHap %>%
   rename("2020" = mean_Str2020, "2021" = mean_Str2021, "2022" = mean_Str2022) %>%
   select(country_name, country_code, "2020", "2021", "2022") %>%
   pivot_longer (c("2020", "2021", "2022"), names_to = "year", values_to = "Stringency")
-head(Stringency_Country_Year_all)
+#head(Stringency_Country_Year_all)
 Stringency_Country_Year_all %>%
   group_by(country_code) %>%
   ggplot(aes(x = year, y = Stringency, col = 2)) +
@@ -268,28 +268,140 @@ total_data["casediff"][is.na(total_data["casediff"])] <- 0
 total_data["deathsdiff"][is.na(total_data["deathsdiff"])] <- 0
 
 View(total_data)
+library(tidyr)
+
+total_data_wo_na <- total_data %>%
+  drop_na(Happiness)
+
+View(total_data_wo_na)
+total_data_wo_na_2019 <- total_data_wo_na %>%
+  filter(year == c("2020", "2021", "2022"))
+
+View(total_data_wo_na_2019)
 
 
+happiness_by_stringency <- total_data_wo_na_2019 %>%
+  ggplot(aes(x = Stringency, y = Happiness, col=deathsdiff)) + 
+  geom_point() + #(aes(size=deathsdiff)) +
+  theme_minimal() +
+  scale_colour_gradientn(colors=rainbow(7)) +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Differences in Stringency vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
 
-happiness_by_cases <- total_data %>%
-  ggplot(aes(x = casediff, y = Happiness, col=deathsdiff, size=)) + 
+happiness_by_stringency
+
+hap_string_death <- lm(Happiness ~ Stringency + deathsdiff, data = total_data_wo_na)
+summary(hap_string_death)
+
+happiness_by_deaths <- total_data_wo_na_2019 %>%
+  ggplot(aes(x = deathsdiff, y = Happiness))+ #, col=deathsdiff)) + 
+  geom_point() + #(aes(size=deathsdiff)) +
+  theme_minimal() +
+  scale_colour_gradientn(colors=rainbow(7)) +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Differences in Total Covid Deaths vs. Happiness", subtitle="total deaths per year from 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
+happiness_by_deaths
+
+year_2020 <- total_data_wo_na_2019 %>%
+  filter(year == "2020")
+year_2021 <- total_data_wo_na_2019 %>%
+  filter(year == "2021")
+year_2022 <- total_data_wo_na_2019 %>%
+  filter(year == "2022")
+
+model_2020 <- lm(Happiness ~ Stringency, data=year_2020)
+summary(model_2020)
+model_2021 <- lm(Happiness ~ Stringency, data=year_2021)
+summary(model_2021)
+model_2022 <- lm(Happiness ~ Stringency, data=year_2022)
+summary(model_2022)
+
+
+year_2022_desc <- year_2022 %>%
+  arrange(desc(deathsdiff)) %>%
+  filter(deathsdiff > 10)
+
+year_2022_desc <- year_2022_desc %>%
+  arrange(desc(casediff))
+View(year_2022_desc)
+
+plot_2020 <- year_2020 %>%
+  ggplot(aes(x = Stringency, y = Happiness)) + #, col=casediff)) + 
   geom_point() + ##(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
   #facet_wrap(~year, scales = "free") +
-  labs(title="Stringency vs. Happiness", subtitle="dependent on case and death differences between 2020 - 2022") +
+  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
-  facet_wrap(~year, scale = "free")
+  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
+plot_2020
+plot_2021 <- year_2021 %>%
+  ggplot(aes(x = Stringency, y = Happiness)) + #, col=casediff)) + 
+  geom_point() + ##(aes(size=deathsdiff)) +
+  theme_minimal() +
+  scale_colour_gradientn(colors=rainbow(7)) +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
+plot_2021
 
+plot_2022 <- year_2022 %>%
+  ggplot(aes(x = Stringency, y = Happiness))+ #, col=casediff)) + 
+  geom_point() + #(aes(size=deathsdiff)) +
+  theme_minimal() +
+  scale_colour_gradientn(colors=rainbow(7)) +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
 
-happiness_by_cases
+plot_2022
 
-model1_hapcase <- lm(Happiness ~ Stringency + casediff + deathsdiff, data=total_data)
+plot_2022_deaths <- year_2022 %>%
+  ggplot(aes(x = deathsdiff, y = Happiness))+ #, col=casediff)) + 
+  geom_point() + #(aes(size=deathsdiff)) +
+  theme_minimal() +
+  scale_colour_gradientn(colors=rainbow(7)) +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
+
+plot_2022_deaths
+
+plot_year_2022_desc <- year_2022_desc %>%
+  ggplot(aes(x = Stringency, y = Happiness))+ #, col=casediff)) + 
+  geom_point() +# (aes(size=deathsdiff)) +
+  theme_minimal() +
+  scale_colour_gradientn(colors=rainbow(7)) +
+  #facet_wrap(~year, scales = "free") +
+  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
+  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
+
+plot_year_2022_desc
+
+model_2022 <- lm(Happiness ~ Stringency + deathsdiff, data=year_2022_desc)
+summary(model_2022)
+
+View(total_data)
+
+View(china_and_switzerland)
+
+model1_hapstring <- lm(Happiness ~ Stringency, data=total_data)
 model2_hapcasediff <- lm(Happiness ~ casediff * deathsdiff, data=total_data)
 
-summary(model1_hapcase)
+summary(model1_hapstring)
+summary(model2_hapcasediff)
 
 
+#lmermodell <- lmer(Happiness ~ 1 + Stringency + (1 + Stringency|country_name), data=total_data_wo_na_2019)
+#summary(lmermodell)
 
 #############################################################
 ############# Resource for Covid Data #######################
