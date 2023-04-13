@@ -1,5 +1,5 @@
 ---
-title: "Initial_trial_and_error_markdown_file"
+title: "Data Group SNB Covid - Did Stringency Measures Affect Happiness across the world between 2020 and 2022?"
 output: html_document
 date: "`r Sys.Date()`"
 editor_options: 
@@ -112,8 +112,6 @@ AvgStr2022 <- Ox2022_Str %>%
 ```
 
 # 8. combine to one table incl country_code
-
-### head(Avg_Str_0) was wolltest Du damit machen?
 
 ```{r}
 Avg_Str_0 <- OxCGRT_country %>%
@@ -278,7 +276,7 @@ covid_data <- covid_data %>%
 
 ```
 
-Group data, compute date variable, create numeric days variable
+#Group data, compute date variable, create numeric days variable
 
 ```{r}
 
@@ -337,7 +335,8 @@ covid_deaths_total <- left_join(covid_deaths_total, covid_data_2022_total, by="l
 
 ```
 
-### mutate Differences between 2021 and 2020 & 2022 and 2021 
+### mutate Differences between 2021 and 2020 & 2022 and 2021
+
 ### set differences for 2019 and 2020 to 0
 
 ```{r}
@@ -354,7 +353,6 @@ covid_deaths_total["casediff_2022"][is.na(covid_deaths_total["casediff_2022"])] 
 covid_deaths_total["deathsdiff_2021"][is.na(covid_deaths_total["deathsdiff_2021"])] <- 0
 covid_deaths_total["deathsdiff_2022"][is.na(covid_deaths_total["deathsdiff_2022"])] <- 0
 ```
-
 
 # view col names, then install packages to relocate and reorder column names for pivoting
 
@@ -418,8 +416,10 @@ total_data["deathsdiff"][is.na(total_data["deathsdiff"])] <- 0
 
 ```
 
-# remove NAs from Dataset for countries without a happiness score and remove 2019 as it is no longer needed 
+# remove NAs from Dataset for countries without a happiness score and remove 2019 as it is no longer needed
+
 # create new data frames to keep "raw" data
+
 ```{r}
 total_data_wo_na <- total_data %>%
   drop_na(Happiness)
@@ -431,7 +431,6 @@ total_data_wo_na_2019 <- total_data_wo_na %>%
 View(total_data_wo_na_2019)
 
 ```
-
 
 # test relationship between Stringency and Happiness + create plots
 
@@ -488,8 +487,6 @@ happiness_by_deaths <- total_data_wo_na_2019 %>%
   facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
 happiness_by_deaths
 ```
-
-
 
 ## plot cases vs. happiness (by deaths) and test it
 
@@ -569,4 +566,3 @@ plot_2020
 plot_2021
 plot_2022
 ```
-
