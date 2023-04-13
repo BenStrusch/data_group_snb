@@ -243,18 +243,18 @@ covid_deaths_cleaned <- covid_deaths_total %>%
     names_from = type, 
     values_from = score
   )
-head(covid_deaths_cleaned)
+#head(covid_deaths_cleaned)
   
-head(Stringency_Country_Year_all)
-head(covid_deaths_total)
+#head(Stringency_Country_Year_all)
+#head(covid_deaths_total)
 
 covid_cases_and_deaths <- covid_deaths_cleaned %>%
   rename(country_name = location)
-head(covid_deaths_cleaned)
+#head(covid_deaths_cleaned)
 
 total_data <- full_join(Stringency_Country_Year_all, covid_cases_and_deaths, by=c("country_name", "year"))
 total_data <- full_join(Happy_Country_Year_all, total_data, by=c("country_name", "year"))
-head(total_data)
+#head(total_data)
 
 
 total_data <- total_data[,-5]
