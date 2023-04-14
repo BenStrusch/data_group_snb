@@ -413,11 +413,11 @@ total_data_wo_na_2019 <- total_data_wo_na %>%
 36. test relationship between Stringency and Happiness + create plots
 
 ```{r}
-hap_string_death <- lm(Happiness ~ Stringency + deathsdiff, data = total_data_wo_na)
-summary(hap_string_death)
+hap_string <- lm(Happiness ~ Stringency, data = total_data_wo_na)
+summary(hap_string)
 
 happiness_by_stringency <- total_data_wo_na_2019 %>%
-  ggplot(aes(x = Stringency, y = Happiness, col=deathsdiff)) + 
+  ggplot(aes(x = Stringency, y = Happiness)) +
   geom_point() + #(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
@@ -463,7 +463,7 @@ happiness_by_deaths <- total_data_wo_na_2019 %>%
 happiness_by_deaths
 ```
 
-39. plot cases vs. happiness (by deaths) and test it
+39. plot cases vs. happiness and test it
 
 ```{r, warning=FALSE}
 hap_cases <- lm(Happiness ~ casediff, data = total_data_wo_na)
