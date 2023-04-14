@@ -29,7 +29,7 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 # Attempt to read in the happiness data from 2020 to see if there is an effect of covid-deaths on happiness
 
-libraries and packages to load
+libraries and packages to load and step by step guide
 
 ```{r Load Libraries, include=FALSE, warning=FALSE}
 
@@ -457,7 +457,7 @@ happiness_by_deaths <- total_data_wo_na_2019 %>%
   geom_point() + #(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
-  labs(title="Differences in Total Covid Deaths vs. Happiness", subtitle="total deaths per year from 2020 - 2022") +
+  labs(title="Differences in Stringency vs. Happiness", subtitle="by total deaths per year from 2020 - 2022") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
   facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
 happiness_by_deaths
@@ -474,7 +474,7 @@ happiness_by_cases <- total_data_wo_na_2019 %>%
   geom_point() + ##(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
-  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
+  labs(title="Differences in Casedifferences vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
   facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
 
@@ -493,7 +493,7 @@ hap_string_cases_plot <- total_data_wo_na_2019 %>%
   geom_point() + ##(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
-  labs(title="Differences in Deathrates vs. Happiness", subtitle="Differences between presented and previous year from 2020 - 2022") +
+  labs(title="Differences in Stringency vs. Happiness", subtitle="by death rathes: differences between presented and previous year from 2020 - 2022") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
   facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
 
