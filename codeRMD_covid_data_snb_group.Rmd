@@ -64,11 +64,8 @@ OxCGRT_country <- OxCGRTall %>%
   filter (jurisdiction == "NAT_TOTAL")
 head(OxCGRT_country)
 
-
 OxCGRT <- OxCGRT_country %>%
   select (-region_code, -region_name, -jurisdiction, -c(contains("2023")))
-
-
 
 Ox2020 <- OxCGRT %>%
   select (country_code, country_name, c(contains("2020")))
@@ -87,7 +84,6 @@ Ox2022 <- OxCGRT %>%
 Ox2020_Str <- pivot_longer(Ox2020, cols = c(contains("2020")), names_to = "date", values_to = "stringency")
 Ox2021_Str <- pivot_longer(Ox2021, cols = c(contains("2021")), names_to = "date", values_to = "stringency")
 Ox2022_Str <- pivot_longer(Ox2022, cols = c(contains("2022")), names_to = "date", values_to = "stringency")
-
 
 AvgStr2020 <- Ox2020_Str %>%
   group_by(country_name) %>%
@@ -116,23 +112,22 @@ Avg_Str_all <- left_join(AvgStr2020, Avg_Str_21)
 Avg_Str <- Avg_Str_all %>% drop_na()
 ```
 
-10. rename and add Stringency "0" for 2019
+10. rename
 
 ```{r, include=FALSE}
 Avg_Str_year <- Avg_Str %>%
   rename("2020" = "mean_Str2020", "2021" = "mean_Str2021", "2022" = "mean_Str2022")
-Avg_Str_year$"2019"[1:181] <- 0 ### keine Spalte mit 2019
 ```
 
 11. transpose
 
 ```{r, include=FALSE}
 Avg_Str_country <- Avg_Str_year %>%
-  pivot_longer (c("2019", "2020", "2021", "2022"), names_to = "year", values_to = "stringency")
+  pivot_longer (c("2020", "2021", "2022"), names_to = "year", values_to = "stringency")
 
 ```
 
-12. visualizing stringency per country 2019-2022
+12. visualizing stringency per country 2020-2022
 
 ```{r}
 Avg_Str_country %>%
@@ -174,8 +169,8 @@ allStr_h19_20 <- merge(allStr_h2019, only_happy_2020,by="country_name")
 
 ```{r, include=FALSE}
 only_happy_2021 <- happy_2021%>%
-  select(Country.name, Ladder.score) %>%
-  rename(country_name = Country.name, Happy2021 = Ladder.score)%>%
+  select(ï..Country.name, Ladder.score, Regional.indicator) %>%
+  rename(country_name = ï..Country.name, Happy2021 = Ladder.score)%>%
   arrange(country_name)
 allStr_h19_20_21 <- merge(allStr_h19_20, only_happy_2021,by="country_name")
 ```
@@ -205,28 +200,34 @@ allStr_allHap %>%
   geom_point(show.legend = FALSE)
 ```
 
-19. visualizing Happiness per country over time 2019-2022 transpose first
+19. visualizing Happiness per country and per region over time 2019-2022 transpose first
 
 ```{r}
 Happy_Country_Year_all <- allStr_allHap %>%
-  rename("2019" = Happy2019, "2020" = Happy2020, "2021" = Happy2021, "2022" = Happy2022) %>%
-  select(country_name, country_code, "2019", "2020", "2021", "2022") %>%
-  pivot_longer(c("2019", "2020", "2021", "2022"), names_to = "year", values_to = "Happiness")
+  rename("2019" = Happy2019, "2020" = Happy2020, "2021" = Happy2021, "2022" = Happy2022, "Region" = Regional.indicator) %>%
+  select(country_name, country_code, "2019", "2020", "2021", "2022", "Region") %>%
+  pivot_longer (c("2019", "2020", "2021", "2022"), names_to = "year", values_to = "Happiness")
 
 Happy_Country_Year_all %>%
   group_by(country_code) %>%
   ggplot(aes(x = year, y = Happiness, col = 2)) +
   geom_point(show.legend = FALSE) +
-  facet_wrap(~country_name)
+  facet_wrap(~country_code)
+
+Happy_Country_Year_all %>%
+  group_by(country_code) %>%
+  ggplot(aes(x = year, y = Happiness, col = 2)) +
+  geom_point(show.legend = FALSE) +
+  facet_wrap(~Region)
 ```
 
-20. visualizing Stringency per country over time 2020-2022 transpose first
+20. visualizing Stringency per country and region over time 2020-2022 transpose first
 
 ```{r}
 
 Stringency_Country_Year_all <- allStr_allHap %>%
-  rename("2020" = mean_Str2020, "2021" = mean_Str2021, "2022" = mean_Str2022) %>%
-  select(country_name, country_code, "2020", "2021", "2022") %>%
+  rename("2020" = mean_Str2020, "2021" = mean_Str2021, "2022" = mean_Str2022, "Region" = Regional.indicator) %>%
+  select(country_name, country_code, "2020", "2021", "2022", "Region") %>%
   pivot_longer (c("2020", "2021", "2022"), names_to = "year", values_to = "Stringency")
 head(Stringency_Country_Year_all)
 Stringency_Country_Year_all %>%
@@ -234,6 +235,12 @@ Stringency_Country_Year_all %>%
   ggplot(aes(x = year, y = Stringency, col = 2)) +
   geom_point(show.legend = FALSE) +
   facet_wrap(~country_name)
+
+Stringency_Country_Year_all %>%
+  group_by(country_code) %>%
+  ggplot(aes(x = year, y = Stringency, col = 2)) +
+  geom_point(show.legend = FALSE) +
+  facet_wrap(~Region)
 
 ```
 
@@ -380,12 +387,11 @@ total_data <- full_join(Happy_Country_Year_all, total_data, by=c("country_name",
 #head(total_data)
 
 
-total_data <- total_data[,-5]
+total_data <- total_data%>%
+  rename("country_code" = country_code.x, "Region" = Region.x) %>%
+  select(-country_code.y, -Region.y)
 
 #head(total_data)
-
-total_data <- total_data %>%
-  rename(country_code = country_code.x)
 
 total_data["casediff"][is.na(total_data["casediff"])] <- 0
 total_data["deathsdiff"][is.na(total_data["deathsdiff"])] <- 0
@@ -558,3 +564,37 @@ plot_2020
 plot_2021
 plot_2022
 ```
+
+
+
+```{r}
+install.packages("repel")
+library(ggrepel)
+total_data_wo_na_2019 %>%
+  ggplot(aes(x = Stringency, y = Happiness, label = country_code, colour = Region)) +
+  geom_label_repel(aes(label = country_code), size = 3, box.padding = 0, label.padding = 0, max.overlaps = getOption("ggrepel.max.overlaps", default = 60),
+                   segment.color = 'grey') +
+  geom_point()+
+  facet_wrap(~year, scale = "fixed")
+
+total_data_wo_na_2019 %>%
+ggplot(aes(x = Stringency, y = Happiness, label = country_code, colour = Region)) +
+  geom_text_repel(aes(label = country_code), size = 3, 
+                   segment.color = 'grey') +
+  geom_point(aes(size = deathsdiff))+
+  facet_wrap(~year, scale = "fixed")
+
+total_data_wo_na_2019 %>%
+  ggplot(aes(x = Stringency, y = Happiness, label = country_code, colour = Region)) +
+  geom_text_repel(aes(label = country_code), size = 3, 
+                  segment.color = 'grey') +
+  geom_point(aes(size = deathsdiff))+
+  theme_bw()+
+  facet_wrap(~ Region * year) + stat_smooth(method = "lm")
+```
+
+
+
+
+
+
