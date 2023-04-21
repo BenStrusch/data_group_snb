@@ -57,12 +57,12 @@ library(viridis)
 
 ```{r, include=FALSE}
 OxCGRTall <- read_excel("OxCGRT_timeseries_all.xlsx")
-head(OxCGRTall)
-colnames(OxCGRTall)
+#head(OxCGRTall)
+#colnames(OxCGRTall)
 
 OxCGRT_country <- OxCGRTall %>%
   filter (jurisdiction == "NAT_TOTAL")
-head(OxCGRT_country)
+#head(OxCGRT_country)
 
 OxCGRT <- OxCGRT_country %>%
   select (-region_code, -region_name, -jurisdiction, -c(contains("2023")))
@@ -169,8 +169,8 @@ allStr_h19_20 <- merge(allStr_h2019, only_happy_2020,by="country_name")
 
 ```{r, include=FALSE}
 only_happy_2021 <- happy_2021%>%
-  select(ï..Country.name, Ladder.score, Regional.indicator) %>%
-  rename(country_name = ï..Country.name, Happy2021 = Ladder.score)%>%
+  select(Country.name, Ladder.score, Regional.indicator) %>%
+  rename(country_name = Country.name, Happy2021 = Ladder.score)%>%
   arrange(country_name)
 allStr_h19_20_21 <- merge(allStr_h19_20, only_happy_2021,by="country_name")
 ```
@@ -567,8 +567,8 @@ plot_2022
 
 
 
-```{r}
-install.packages("repel")
+```{r echo=FALSE, warning=FALSE, fig.height=20, fig.width=15}
+#install.packages("repel")
 library(ggrepel)
 total_data_wo_na_2019 %>%
   ggplot(aes(x = Stringency, y = Happiness, label = country_code, colour = Region)) +
