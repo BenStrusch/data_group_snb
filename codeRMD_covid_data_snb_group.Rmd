@@ -410,7 +410,7 @@ total_data_wo_na <- total_data %>%
 
 View(total_data_wo_na)
 total_data_wo_na_2019 <- total_data_wo_na %>%
-  filter(year == c("2020", "2021", "2022"))
+  filter (year != "2019")
 
 #View(total_data_wo_na_2019)
 
@@ -565,7 +565,7 @@ plot_2021
 plot_2022
 ```
 
-
+43. plot
 
 ```{r echo=FALSE, warning=FALSE, fig.height=20, fig.width=15}
 #install.packages("repel")
@@ -593,6 +593,30 @@ total_data_wo_na_2019 %>%
   facet_wrap(~ Region * year) + stat_smooth(method = "lm")
 ```
 
+44. add continent
+
+```{r}
+total_data_wo_na_2019$Continent <- total_data_wo_na_2019$Region
+
+total_new <- total_data_wo_na_2019 %>%
+  mutate(Continent = case_when(Region == "Sub-Saharan Africa" ~ "Africa", TRUE~Continent)) %>%
+  mutate(Continent = case_when(Region == "Middle East and North Africa" ~ "Africa", TRUE ~Continent)) %>%
+  mutate(Continent = case_when(Region == "South Asia" ~ "Asia", TRUE ~Continent))  %>%
+  mutate(Continent = case_when(Region == "Central and Eastern Europe" ~ "Europe", TRUE ~Continent))  %>%
+  mutate(Continent = case_when(Region == "Commonwealth of Independent States" ~ "Asia", TRUE ~Continent)) %>%
+  mutate(Continent = case_when(Region == "East Asia" ~ "Asia", TRUE ~Continent)) %>%
+  mutate(Continent = case_when(Region == "Latin America and Caribbean" ~ "South America", TRUE ~Continent)) %>%
+  mutate(Continent = case_when(Region == "North America and ANZ" ~ "North America", TRUE ~Continent)) %>%
+  mutate(Continent = case_when(Region == "Southeast Asia" ~ "Asia", TRUE ~Continent)) %>%
+  mutate(Continent = case_when(Region == "Western Europe" ~ "Europe", TRUE ~Continent)) 
+
+total_new %>%
+  ggplot(aes(x = Stringency, y = Happiness, label = country_code, colour = Continent)) +
+  geom_point(aes(size = deathsdiff))+
+  theme_minimal()+
+  facet_wrap(~ Continent * year, ncol = 3) + stat_smooth(method = "lm")
+
+```
 
 
 
