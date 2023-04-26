@@ -129,7 +129,7 @@ Avg_Str_country <- Avg_Str_year %>%
 
 12. visualizing stringency per country 2020-2022
 
-```{r}
+```{r include=FALSE}
 Avg_Str_country %>%
   ggplot(aes(year, stringency, col = country_code)) +
   geom_point(show.legend = FALSE) +
@@ -188,7 +188,7 @@ head(allStr_allHap)
 
 18. visualizing Stringency vs Happiness per year 2020-2022
 
-```{r}
+```{r, include=FALSE}
 allStr_allHap %>%
   ggplot(aes(x = mean_Str2020, y = Happy2020, col = 2)) +
   geom_point(show.legend = FALSE)
@@ -202,7 +202,7 @@ allStr_allHap %>%
 
 19. visualizing Happiness per country and per region over time 2019-2022 transpose first
 
-```{r}
+```{r, include=FALSE}
 Happy_Country_Year_all <- allStr_allHap %>%
   rename("2019" = Happy2019, "2020" = Happy2020, "2021" = Happy2021, "2022" = Happy2022, "Region" = Regional.indicator) %>%
   select(country_name, country_code, "2019", "2020", "2021", "2022", "Region") %>%
@@ -223,7 +223,7 @@ Happy_Country_Year_all %>%
 
 20. visualizing Stringency per country and region over time 2020-2022 transpose first
 
-```{r}
+```{r, include=FALSE}
 
 Stringency_Country_Year_all <- allStr_allHap %>%
   rename("2020" = mean_Str2020, "2021" = mean_Str2021, "2022" = mean_Str2022, "Region" = Regional.indicator) %>%
@@ -509,7 +509,7 @@ hap_string_cases_plot
 
 41. create subsets per year, then run regression of Stringency on Happiness per year to assess yearly differences in relationship between Stringency and Happiness
 
-```{r}
+```{r, include=FALSE}
 year_2020 <- total_data_wo_na_2019 %>%
   filter(year == "2020")
 year_2021 <- total_data_wo_na_2019 %>%
@@ -529,7 +529,7 @@ summary(model_2022)
 
 42. plot models per year
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, include=FALSE}
 plot_2020 <- year_2020 %>%
   ggplot(aes(x = Stringency, y = Happiness)) + #, col=casediff)) + 
   geom_point() + ##(aes(size=deathsdiff)) +
@@ -595,7 +595,7 @@ total_data_wo_na_2019 %>%
 
 44. add continent
 
-```{r}
+```{r fig.height=30, fig.width=20,warning=FALSE}
 total_data_wo_na_2019$Continent <- total_data_wo_na_2019$Region
 
 total_new <- total_data_wo_na_2019 %>%
