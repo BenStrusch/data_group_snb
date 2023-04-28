@@ -17,11 +17,30 @@ knitr::opts_chunk$set(echo = TRUE)
 
 R Markdown <http://rmarkdown.rstudio.com>.
 
-## Questions to Dirk and Rui 28.04.2023:
+# Questions to Dirk and Rui 28.04.2023:
 
   1. shall we go into more detail about each analysis?
   2. Should we include means and some descriptive statistics, and was it helpful to include inferential statistics?
   3. How to get one "average" regression line into the penultimate plot?
+  
+# To do for pitch 12/05/2023:
+- create two slide presentation similar to the final one
+
+- simplify the data pitch, particularly for the short pitch: data sources and processing (need to imagine to present it to someone who does not know what a data frame is; focus on the framework; don't mention regression)
+
+- lancet study came too early, gave the impression that this is a clincial project // consider cutting it // what is the causal link between MH and Happiness??? / make the link between research on clinical sample and general population more clear!
+- spend more time on the measures and how they can mean happiness --> how do these impact happiness
+
+- results much clearer: what are the results, 3 limitations and 3 implications --> clear "Take-Home-Message"
+
+--> Clearer rationale and simpler research question: focus on just one or two things and really specifcy why this is important & how you rationalise it
+
+- strictly two slides, the second slide should reflect the main finding!
+
+
+(1) Rationale for regional differences -> Plan: compare Western Europe to Sars-Cov-1 countries - justify "preparedness"
+(2) Average of 15-19 --> standardise, then compare change levels
+(3) compare across years --> changes over time pre-, peri- and post-pandemic
 
 read in the happiness data from 2020 to see if there is an effect of covid-deaths on happiness
 
