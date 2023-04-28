@@ -450,10 +450,10 @@ happiness_by_deaths
 
 38. test happiness vs. stringency and deathsdiff, create plots
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, echo=FALSE}
 hap_string_death <- lm(Happiness ~ Stringency * deathsdiff, data = total_data_wo_na)
-summary(total_data_wo_na_2019)
-summary(hap_string_death)
+#summary(total_data_wo_na_2019)
+#summary(hap_string_death)
 
 happiness_by_deaths <- total_data_wo_na_2019 %>%
   ggplot(aes(x = Stringency, y = Happiness, col=deathsdiff)) + 
@@ -526,7 +526,7 @@ summary(model_2022)
 
 42. plot models per year
 
-```{r warning=FALSE, include=FALSE}
+```{r warning=FALSE, include=FALSE, echo=FALSE}
 plot_2020 <- year_2020 %>%
   ggplot(aes(x = Stringency, y = Happiness)) + #, col=casediff)) + 
   geom_point() + ##(aes(size=deathsdiff)) +
@@ -593,7 +593,7 @@ total_data_wo_na_2019 %>%
 
 44. add continent
 
-```{r fig.height=30, fig.width=40, warning=FALSE}
+```{r fig.height=30, fig.width=40, warning=FALSE, echo=FALSE}
 total_data_wo_na_2019$Continent <- total_data_wo_na_2019$Region
 
 total_new <- total_data_wo_na_2019 %>%
