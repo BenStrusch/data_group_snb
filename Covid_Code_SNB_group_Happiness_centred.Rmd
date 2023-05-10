@@ -502,13 +502,13 @@ hap_string_death <- lm(Happiness ~ Stringency * DeathsPerMillion, data = total_d
 summary(hap_string_death)
 
 hapsting_by_deaths <- total_data %>%
-  ggplot(aes(x = Stringency, y = Happiness, col=DeathsPerMillion)) + 
+  ggplot(aes(x = Stringency, y = Happiness))+ #, col=DeathsPerMillion)) + 
   geom_point() + #(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
-  labs(title="Differences in Stringency vs. Happiness", subtitle="by total deaths per million per year from 2020 - 2022") +
+  labs(title="Influence of Stringency on Happiness", subtitle="Happiness change from pre-pandemic levels") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
-  facet_wrap(~year, scale = "free") + stat_smooth(method = 'lm')
+  facet_wrap(~year, scale="free") + stat_smooth(method = 'lm')
 hapsting_by_deaths
 ```
 
@@ -536,7 +536,7 @@ hap_string_cases <- lm(Happiness ~ Stringency * CasesPerMillion, data = total_da
 summary(hap_string_cases)
 
 hap_string_cases_plot <- total_data %>%
-  ggplot(aes(x = Stringency, y = Happiness, col=CasesPerMillion)) + 
+  ggplot(aes(x = Stringency, y = Happiness)) + #, col=CasesPerMillion)) + 
   geom_point() + ##(aes(size=deathsdiff)) +
   theme_minimal() +
   scale_colour_gradientn(colors=rainbow(7)) +
@@ -568,7 +568,7 @@ summary(model_2022)
 
 42. plot models per year
 
-```{r warning=FALSE, include=FALSE, echo=FALSE}
+```{r warning=FALSE, include=FALSE, echo=FALSE, include=FALSE}
 plot_2020 <- year_2020 %>%
   ggplot(aes(x = Stringency, y = Happiness)) + #, col=casediff)) + 
   geom_point() + ##(aes(size=deathsdiff)) +
@@ -606,7 +606,7 @@ plot_2022
 
 43. plot
 
-```{r echo=FALSE, fig.height=30, fig.width=45, warning=FALSE}
+```{r echo=FALSE, fig.height=30, fig.width=45, warning=FALSE, include=FALSE}
 library(ggrepel)
 #total_data %>%
   #ggplot(aes(x = Stringency, y = Happiness, label = country_code, colour = Region)) +
@@ -646,7 +646,7 @@ total_data %>%
 
 44. add continent
 
-```{r fig.height=30, fig.width=40, warning=FALSE, echo=FALSE}
+```{r fig.height=30, fig.width=40, include=FALSE, warning=FALSE, echo=FALSE}
 total_data$Continent <- total_data$Region
 
 total_new <- total_data %>%

@@ -282,10 +282,10 @@ plot1
 
 #total_data_just_pandemic<- total_data %>% filter (year != c("avg_pre_pandemic_happiness", "2015", "2016", "2017", "2018", "2019"))
 
-hap_string <- lm(Happiness ~ Stringency, data = total_data_just_pandemic)
+hap_string <- lm(Happiness ~ Stringency, data = total_data)
 summary(hap_string)
 
-happiness_by_stringency <- total_data_just_pandemic %>%
+happiness_by_stringency <- total_data %>%
   ggplot(aes(x = Stringency, y = Happiness)) +
   geom_point() + #(aes(size=deathsdiff)) +
   theme_minimal() +
