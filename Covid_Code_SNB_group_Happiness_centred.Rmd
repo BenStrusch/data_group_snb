@@ -479,7 +479,7 @@ summary(hap_death)
 
 37. test happiness vs. death differences and create plots
 
-```{r, warning=FALSE, include=FALSE}
+```{r, warning=FALSE}
 
 hap_death <- lm(Happiness ~ DeathsPerMillion, data = total_data)
 summary(hap_death)
