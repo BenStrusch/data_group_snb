@@ -508,7 +508,7 @@ hapsting_by_deaths <- total_data %>%
   scale_colour_gradientn(colors=rainbow(7)) +
   labs(title="Influence of Stringency on Happiness", subtitle="Happiness change from pre-pandemic levels") +
   theme(legend.position = "bottom", legend.text = element_text(size = 5)) +
-  facet_wrap(~year, scale="free") + stat_smooth(method = 'lm')
+  facet_wrap(~year, scale="fixed") + stat_smooth(method = 'lm')
 hapsting_by_deaths
 ```
 
