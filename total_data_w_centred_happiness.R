@@ -468,3 +468,8 @@ total_new %>%
                                         linetype = 'dotted')) + 
   labs(title="Stringency vs. Happiness across continents between 2020-2022", 
        subtitle="accounting for death rates per year") #+ theme_gray(base_size = 30)
+
+
+rcm <- lmer(Happiness ~ 1 + Stringency + (1 + Stringency | country_code), data = total_data)
+summary(rcm)
+
